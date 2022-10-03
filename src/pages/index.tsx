@@ -1,5 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { Provider } from 'react-redux';
+import {store} from '../app/store'
 import { Exercise } from '../Exercise';
 
 const Home: NextPage = () => {
@@ -13,7 +15,9 @@ const Home: NextPage = () => {
 
       <main>
         <h1>Form Exercise</h1>
+        <Provider store={store}>
         <Exercise />
+        </Provider>
       </main>
     </div>
   );

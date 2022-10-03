@@ -1,4 +1,4 @@
-import React, {useReducer} from 'react';
+import React from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -11,51 +11,48 @@ import { Form } from 'react-final-form';
 import { composeValidators } from './composeValidators';
 import {validateEmail} from './validate/validateEmail'
 import {validateEmpty} from './validate/validateEmpty'
-import produce from 'immer'
+import { useSelector } from 'react-redux';
+import {RootState, store} from './app/store';
+import {Provider} from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { updateName, updateEmail, submitForm } from './features/submit/SubmitSlice';
 
 const ACTIONS ={
-  HANDLE_CHANGE: 'handleChange',
+  HANDLE_NAME_CHANGE: 'handleNameChange',
+  HANDLE_EMAIL_CHANGE: 'handleEmailChange',
   HANDLE_SUBMIT: 'handleSubmit'
 }
 
-//handles the dispatch action types
-function reducer(draft: any, action: any){
-  switch (action.type){
-    case ACTIONS.HANDLE_CHANGE:
-      draft[action.payload.name] = action.payload.value
-      return
-    case ACTIONS.HANDLE_SUBMIT:
-      draft.submittedName = draft.fullName
-      draft.submittedEmail = draft.email
-      return
-    default:
-      return 
-  }
-}
-//curriedReducer allows us to have less boilerplate code
-const curriedReducer = produce(reducer)
+function ExerciseComponent() { 
+  const fullName = useSelector((state: RootState) => state.submit.fullName)
+  const email = useSelector((state: RootState) => state.submit.email) 
+  const submittedName = useSelector((state: RootState) => state.submit.submittedName)
+  const submittedEmail = useSelector((state: RootState) => state.submit.submittedEmail) 
+  const dispatch = useDispatch();
 
-function ExerciseComponent() {  
-  const [state, dispatch] = useReducer(curriedReducer, {
-    fullName: "",
-    email: "",
-    submittedName: "",
-    submittedEmail: ""
-  })
-  
+  //Update values as typed
+  const updateInputChange = (event: any, action: string) =>{
+    switch (action){
+      case ACTIONS.HANDLE_NAME_CHANGE:
+        dispatch(updateName(event.target.value))
+        return
+      case ACTIONS.HANDLE_EMAIL_CHANGE:
+        dispatch(updateEmail(event.target.value))
+        return
+      default:
+        return 
+    }
+  }
+
   const handleSubmit = () => {
     //if email field valid 
-    if(composeValidators(validateEmpty, validateEmail)(state.email)){
+    if(composeValidators(validateEmpty, validateEmail)(email)){
       //update submitted form
-      dispatch({type:ACTIONS.HANDLE_SUBMIT})
+      dispatch(submitForm())
     }
   };
 
-  //Update values as typed
-  const updateInputChange = (event: any) =>{
-    dispatch({type:ACTIONS.HANDLE_CHANGE, payload: event.target})
-  }
-
+  
   return (
     <Grid container spacing={3}>
       <Grid item xs={6}>
@@ -69,13 +66,14 @@ function ExerciseComponent() {
                 <Card>
                   <CardHeader title="Form" />
                   <CardContent>
+                    <Provider store={store}>
                     <TextField 
                       name="fullName"
                       label="Full Name" 
                       type="text" 
                       placeholder="Full Name" 
-                      value={state.fullName} 
-                      onChange={updateInputChange}
+                      value={fullName} 
+                      onChange={(e)=>updateInputChange(e,ACTIONS.HANDLE_NAME_CHANGE)}
                     >
                     </TextField>
                     <TextField 
@@ -84,10 +82,11 @@ function ExerciseComponent() {
                       type="email" 
                       required={true} 
                       placeholder="Email" 
-                      value={state.email}
-                      onChange={updateInputChange}
+                      value={email}
+                      onChange={(e)=>updateInputChange(e,ACTIONS.HANDLE_EMAIL_CHANGE)}
                     >
                     </TextField>
+                    </Provider>
                   </CardContent>
                   <CardActions>
                     <Button fullWidth variant="contained" type="submit">
@@ -104,12 +103,14 @@ function ExerciseComponent() {
         <Card>
           <CardHeader title="Submitted Form" />
           <CardContent>
+            <Provider store={store}>
             <Typography>
-              <strong>Full Name: {state.submittedName}</strong>
+              <strong>Full Name: {submittedName}</strong>
             </Typography>
             <Typography>
-              <strong>Email: {state.submittedEmail}</strong>
+              <strong>Email: {submittedEmail}</strong>
             </Typography>
+            </Provider>
           </CardContent>
         </Card>
       </Grid>

@@ -1,4 +1,4 @@
-export const validateEmpty = (input:any) =>{
+export const validateEmpty = (input:string) =>{
     if(input.length == 0){
         return false
     }
