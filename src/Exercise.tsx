@@ -31,8 +31,8 @@ function ExerciseComponent() {
   const dispatch = useDispatch();
 
   //Update values as typed
-  const updateInputChange = (event: any, action: string) =>{
-    switch (action){
+  const updateInputChange = (event: any, action: any) =>{
+    switch (action.type){
       case ACTIONS.HANDLE_NAME_CHANGE:
         dispatch(updateName(event.target.value))
         return
@@ -73,7 +73,7 @@ function ExerciseComponent() {
                       type="text" 
                       placeholder="Full Name" 
                       value={fullName} 
-                      onChange={(e)=>updateInputChange(e,ACTIONS.HANDLE_NAME_CHANGE)}
+                      onChange={(e)=>updateInputChange(e,{type:ACTIONS.HANDLE_NAME_CHANGE})}
                     >
                     </TextField>
                     <TextField 
@@ -83,7 +83,7 @@ function ExerciseComponent() {
                       required={true} 
                       placeholder="Email" 
                       value={email}
-                      onChange={(e)=>updateInputChange(e,ACTIONS.HANDLE_EMAIL_CHANGE)}
+                      onChange={(e)=>updateInputChange(e,{type:ACTIONS.HANDLE_EMAIL_CHANGE})}
                     >
                     </TextField>
                     </Provider>
